@@ -1,22 +1,11 @@
 const express = require('express');
 const app = express();
 
-app.get('/api/jobs', (req, res) => {
-  // ...
-});
+const authRouter = require('./auth/auth');
+const offersRouter = require('./offers/offers');
 
-app.get('/api/jobs/:id', (req, res) => {
-  // ...
-});
+app.use('/api/auth', authRouter);
+app.use('/api/offers', offersRouter);
 
-app.post('/api/jobs', (req, res) => {
-  // ...
-});
-
-app.put('/api/jobs/:id', (req, res) => {
-  // ...
-});
-
-app.delete('/api/jobs/:id', (req, res) => {
-  // ...
-});
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Server running on port ${port}`));
