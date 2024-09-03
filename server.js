@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const login = require('./controllers/login');
+const register = require('./controllers/register');
 const User = require('./models/User');
 const authenticate = require('./middleware/auth');
 
@@ -44,24 +45,11 @@ app.post('/api/auth/login', async (req, res) => {
 // API endpoint to handle registration
 app.post('/api/auth/register', async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
-
-  if (!firstName || !lastName || !email || !password) {
-    return res.status(400).json({ error: 'Please fill in all fields' });
-  }
-
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({ error: 'Email already exists' });
-  }
-
-  const user = new User({ firstName, lastName, email, password });
   try {
-    await user.save();
-    console.log(`User created: ${user}`);
-    res.json({ message: 'Registration successful!' });
+    const result = await register(firstName, lastName, email, password); // Call the register controller
+    res.json(result);
   } catch (error) {
-    console.error('Error saving user:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(400).json({ error: error.message });
   }
 });
 

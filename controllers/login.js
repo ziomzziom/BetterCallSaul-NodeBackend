@@ -1,17 +1,15 @@
 const User = require('../models/User');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 async function login(email, password) {
-  // Find the user by email
   const user = await User.findOne({ email });
-
   if (!user) {
     throw new Error('Invalid email or password');
   }
 
-  // Check if the password matches
-  if (!(await user.comparePassword(password))) {
+  const isValid = await user.comparePassword(password);
+
+  if (!isValid) {
     throw new Error('Invalid email or password');
   }
 
