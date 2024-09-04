@@ -4,26 +4,27 @@ exports.create = async (req, res) => {
   try {
     const {
       title,
-      location,
+      description,
       date,
       time,
       vatInvoice,
       createdBy,
       price,
       status,
+      location,
     } = req.body;
+
+    if (!location || !location.city || !location.street || !location.postalCode || !location.province) {
+      return res.status(400).json({ message: 'Location is required' });
+    }
 
     const offer = new Offer({
       title,
-      location: { name: location.name },
+      location,
       date,
       time,
       vatInvoice,
-      createdBy: {
-        photo: createdBy.photo,
-        firstName: createdBy.firstName,
-        lastName: createdBy.lastName,
-      },
+      createdBy,
       price,
       status,
     });
@@ -37,52 +38,52 @@ exports.create = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-    try {
-      const offers = await Offer.find().exec();
-      res.status(200).json(offers);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error getting all offers' });
+  try {
+    const offers = await Offer.find().exec();
+    res.status(200).json(offers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error getting all offers' });
+  }
+};
+
+exports.getOne = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const offer = await Offer.findById(id).exec();
+    if (!offer) {
+      res.status(404).json({ message: 'Offer not found' });
+    } else {
+      res.status(200).json(offer);
     }
-  };
-  
-  exports.getOne = async (req, res) => {
-    try {
-      const id = req.params.id;
-      const offer = await Offer.findById(id).exec();
-      if (!offer) {
-        res.status(404).json({ message: 'Offer not found' });
-      } else {
-        res.status(200).json(offer);
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error getting offer' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error getting offer' });
+  }
+};
+
+exports.update = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const offer = await Offer.findByIdAndUpdate(id, req.body, { new: true }).exec();
+    if (!offer) {
+      res.status(404).json({ message: 'Offer not found' });
+    } else {
+      res.status(200).json(offer);
     }
-  };
-  
-  exports.update = async (req, res) => {
-    try {
-      const id = req.params.id;
-      const offer = await Offer.findByIdAndUpdate(id, req.body, { new: true }).exec();
-      if (!offer) {
-        res.status(404).json({ message: 'Offer not found' });
-      } else {
-        res.status(200).json(offer);
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error updating offer' });
-    }
-  };
-  
-  exports.deleteOffer = async (req, res) => {
-    try {
-      const id = req.params.id;
-      await Offer.findByIdAndRemove(id).exec();
-      res.status(200).json({ message: 'Offer deleted successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error deleting offer' });
-    }
-  };
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error updating offer' });
+  }
+};
+
+exports.deleteOffer = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Offer.findByIdAndRemove(id).exec();
+    res.status(200).json({ message: 'Offer deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error deleting offer' });
+  }
+};

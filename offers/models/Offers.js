@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const offerSchema = new mongoose.Schema({
   title: { type: String, required: true },
   location: {
-    name: { type: String, required: true },
+    city: { type: String, required: true },
+    street: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    province: { type: String, required: true },
   },
   date: { type: Date, required: true },
   time: { type: String, required: true },
