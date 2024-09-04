@@ -18,14 +18,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/bettercallsaul', { useNewUrlParser: 
     console.error('Error connecting to MongoDB:', error);
   });
 
-const cors = require('cors');
-
-router.use(cors({
-  origin: 'http://localhost:3001',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
 // Middleware to parse JSON request bodies
 router.use(bodyParser.json());
 

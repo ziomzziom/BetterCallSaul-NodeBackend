@@ -3,6 +3,14 @@ const app = express();
 
 app.use(express.json());
 
+const cors = require('cors');
+
+app.use(cors({
+  origin: 'http://localhost:3001',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 const authRouter = require('./auth/auth');
 const offersRouter = require('./offers/offers');
 

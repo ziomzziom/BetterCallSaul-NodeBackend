@@ -18,6 +18,15 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: 'Location is required' });
     }
 
+    const { city, street, postalCode, province } = location;
+
+    // Geocode the location using Nominatim API
+    const nominatimUrl = `https://nominatim.openstreetmap.org/search?city=${city}&street=${street}&postalcode=${postalCode}&format=json`;
+    const response = await fetch(nominatimUrl);
+    const data = await response.json();
+    const lat = data[0].lat;
+    const lon = data[0].lon;
+
     const offer = new Offer({
       title,
       location,
@@ -27,6 +36,10 @@ exports.create = async (req, res) => {
       createdBy,
       price,
       status,
+      coordinates: {
+        latitude: lat,
+        longitude: lon,
+      },
     });
 
     await offer.save();

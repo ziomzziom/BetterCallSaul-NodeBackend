@@ -6,7 +6,11 @@ const offerSchema = new mongoose.Schema({
     city: { type: String, required: true },
     street: { type: String, required: true },
     postalCode: { type: String, required: true },
-    province: { type: String, required: true },
+    province: { type: String, required: true }
+  },
+  coordinates: {
+    latitude: { type: Number },
+    longitude: { type: Number },
   },
   date: { type: Date, required: true },
   time: { type: String, required: true },
