@@ -60,21 +60,6 @@ exports.getAll = async (req, res) => {
   }
 };
 
-exports.getOne = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const offer = await Offer.findById(id).exec();
-    if (!offer) {
-      res.status(404).json({ message: 'Offer not found' });
-    } else {
-      res.status(200).json(offer);
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error getting offer' });
-  }
-};
-
 exports.update = async (req, res) => {
   try {
     const id = req.params.id;
@@ -87,6 +72,54 @@ exports.update = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error updating offer' });
+  }
+};
+
+exports.getOne = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ message: 'Query parameter is required' });
+    }
+
+    const offers = await Offer.find({
+      $or: [
+        { title: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } },
+        { 'location.province': { $regex: query, $options: 'i' } },
+      ],
+    });
+
+    if (!offers.length) {
+      res.status(404).json({ message: 'No offers found' });
+    } else {
+      res.status(200).json(offers);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error getting offers' });
+  }
+};
+
+exports.search = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ message: 'Query parameter is required' });
+    }
+
+    const offers = await Offer.find({
+      $or: [
+        { title: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } },
+        { 'location.province': { $regex: query, $options: 'i' } },
+      ],
+    });
+
+    res.status(200).json(offers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error searching offers' });
   }
 };
 
