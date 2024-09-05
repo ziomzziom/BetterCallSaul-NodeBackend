@@ -50,16 +50,6 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.getAll = async (req, res) => {
-  try {
-    const offers = await Offer.find().exec();
-    res.status(200).json(offers);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error getting all offers' });
-  }
-};
-
 exports.update = async (req, res) => {
   try {
     const id = req.params.id;
@@ -72,6 +62,22 @@ exports.update = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error updating offer' });
+  }
+};
+
+exports.getAll = async (req, res) => {
+  try {
+    const offers = await Offer.find().exec();
+    const now = new Date();
+    offers.forEach((offer) => {
+      const createdAt = new Date(offer.date);
+      const daysSinceCreated = Math.round((now - createdAt) / (1000 * 60 * 60 * 24));
+      offer.isNew = daysSinceCreated < 5 ? true : daysSinceCreated;
+    });
+    res.status(200).json(offers.map((offer) => ({ ...offer.toObject(), isNew: offer.isNew })));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error getting all offers' });
   }
 };
 
@@ -93,7 +99,13 @@ exports.getOne = async (req, res) => {
     if (!offers.length) {
       res.status(404).json({ message: 'No offers found' });
     } else {
-      res.status(200).json(offers);
+      const now = new Date();
+      offers.forEach((offer) => {
+        const createdAt = new Date(offer.date);
+        const daysSinceCreated = Math.round((now - createdAt) / (1000 * 60 * 60 * 24));
+        offer.isNew = daysSinceCreated < 5 ? true : daysSinceCreated;
+      });
+      res.status(200).json(offers.map((offer) => ({ ...offer.toObject(), isNew: offer.isNew })));
     }
   } catch (error) {
     console.error(error);
