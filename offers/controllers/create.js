@@ -115,23 +115,28 @@ exports.getOne = async (req, res) => {
 
 exports.search = async (req, res) => {
   try {
-    const { query } = req.query;
-    if (!query) {
-      return res.status(400).json({ message: 'Query parameter is required' });
+    const { searchQuery, provinceId } = req.query;
+    if (!searchQuery || !provinceId) {
+      throw new Error('Search query and province ID are required');
     }
 
+    const provinceName = provinces.find((province) => province.id === provinceId).name;
     const offers = await Offer.find({
       $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } },
-        { 'location.province': { $regex: query, $options: 'i' } },
+        { title: { $regex: searchQuery, $options: 'i' } },
+        { description: { $regex: searchQuery, $options: 'i' } },
+        { 'location.province': provinceName },
       ],
     });
+
+    if (!offers.length) {
+      return res.status(404).json([]);
+    }
 
     res.status(200).json(offers);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error searching offers' });
+    res.status(500).json({ error: error.message });
   }
 };
 
