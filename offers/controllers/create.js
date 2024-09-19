@@ -83,18 +83,21 @@ exports.getAll = async (req, res) => {
 
 exports.getOne = async (req, res) => {
   try {
-    const { query } = req.query;
-    if (!query) {
-      return res.status(400).json({ message: 'Query parameter is required' });
-    }
+    const { query, province } = req.query;
 
-    const offers = await Offer.find({
-      $or: [
+    const queryObject = {};
+    if (query) {
+      queryObject.$or = [
         { title: { $regex: query, $options: 'i' } },
         { description: { $regex: query, $options: 'i' } },
-        { 'location.province': { $regex: query, $options: 'i' } },
-      ],
-    });
+      ];
+    }
+
+    if (province) {
+      queryObject['location.province'] = province;
+    }
+
+    const offers = await Offer.find(queryObject);
 
     if (!offers.length) {
       res.status(404).json({ message: 'No offers found' });
@@ -115,19 +118,21 @@ exports.getOne = async (req, res) => {
 
 exports.search = async (req, res) => {
   try {
-    const { searchQuery, provinceId } = req.query;
-    if (!searchQuery || !provinceId) {
-      throw new Error('Search query and province ID are required');
-    }
+    const { searchQuery, provinceName } = req.query;
 
-    const provinceName = provinces.find((province) => province.id === provinceId).name;
-    const offers = await Offer.find({
-      $or: [
+    const query = {};
+    if (searchQuery) {
+      query.$or = [
         { title: { $regex: searchQuery, $options: 'i' } },
         { description: { $regex: searchQuery, $options: 'i' } },
-        { 'location.province': provinceName },
-      ],
-    });
+      ];
+    }
+
+    if (provinceName) {
+      query['location.province'] = provinceName;
+    }
+
+    const offers = await Offer.find(query);
 
     if (!offers.length) {
       return res.status(404).json([]);
